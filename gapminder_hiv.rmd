@@ -16,7 +16,8 @@ library(plotly)
 library(choroplethr)
 library(choroplethrMaps)
 library(googlesheets)
-source("http://ms.mcmaster.ca/bolker/misc/gapminder_funs.R")
+## DANGER WILL ROBINSON
+source("https://bbolker.github.io/mpha_2019/gapminder_funs.R")
 ```
 
 Creates a `gm_ind` object in the workspace.
