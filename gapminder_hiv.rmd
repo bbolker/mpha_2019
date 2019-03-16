@@ -8,17 +8,22 @@ Data from [Gapminder](https://www.gapminder.org/): the GM foundation
 
 Loading packages and reading data:
 
-```{r setup}
+(Install all of these packages first.  If it asks whether you want to compile newer versions from binary, say "no".)
+
+```{r setup, message=FALSE}
 library(tidyverse)
 library(plotly)
+library(choroplethr)
+library(choroplethrMaps)
+library(googlesheets)
 source("http://ms.mcmaster.ca/bolker/misc/gapminder_funs.R")
 ```
 
 Creates a `gm_ind` object in the workspace.
 
-```{r}
+```{r filtering}
 ## interactive sheet (or via RStudio "spreadsheet" icon)
-View(gm_ind)
+## equivalent toView(gm_ind)
 (gm_ind
   %>% filter(str_detect(indicator,"HIV"))
 )
@@ -29,10 +34,14 @@ View(gm_ind)
   %>% filter(subcategory %in% c("HIV","TB"))
 )
 (gm_ind
-  %>% filter(str_detect(subcategory,"(HIV|TB)"))
+  %>% filter(str_detect(indicator,"(HIV|TB)"))
 )
 (gm_ind
-  %>% filter(str_detect(subcategory,"(HIV|TB)"))
+  %>% filter(str_detect(indicator,"(HIV|TB)"))
+  %>% select(indicator:subcategory)
+)
+(gm_ind
+  %>% filter(str_detect(indicator,"(HIV|TB)"))
   %>% select(-URL)
 )
 ```
@@ -57,13 +66,13 @@ theme_set(theme_bw())
   + geom_line()
   + geom_point()
   + theme(legend.position="none")
-  + scale_y_log10()
+  ##+ scale_y_log10()
 )
 ```
 
-Merge with population data:
+Merge with population and region data:
 
-```{r}
+```{r popmerge}
 pop1 <- get_data("Population, total")
 pop2 <- (pop1
   %>% rename(country="Total population")
@@ -73,24 +82,31 @@ pop2 <- (pop1
 hiv4 <- (hiv3
   %>% left_join(pop2)
   %>% left_join(region_tab)
+  %>% filter(year>1989)
 )
 ```
 
-```{r}
+```{r arrange}
 arrange(hiv4,desc(population)) %>% tail()
 ```
 
-```{r}
+Look at the cumulative distribution of log10(population):
+
+```{r ecdf}
 plot(ecdf(log10(hiv4$population)))
 ```
 
-```{r}
+```{r ggplotly}
 hiv5 <- filter(hiv4, population>1e7)
-gg2 <- (ggplot(hiv5,aes(year,prevalence,colour=region,label=country))
+gg2 <- (ggplot(hiv5,aes(year,prevalence,
+                colour=region,
+                ## add 'label' so country
+                ## appears in the tooltips
+                label=country))
   + geom_line(aes(group=country))
   + geom_point()
 )
-ggplotly(gg2)
+ggplotly(gg2)  ## dynamic graphics
 ```
 
 ```{r}
