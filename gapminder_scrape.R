@@ -47,11 +47,6 @@ ind_tab$URL <- hrefs2
 ## write csv and upload
 write_csv(ind_tab,path="gapminder_index.csv")
 
-if (interactive()) {
-    system("scp gapminder_index.csv ms.mcmaster.ca:~/public_html/misc")
-    ## FIXME: put on github instead?
-}
-
 ## https://www.npmjs.com/package/country-region-data
 ## http://www.unicode.org/cldr/charts/latest/supplemental/territory_containment_un_m_49.html
 ## h1 <- suppressWarnings(htmlParse(readLines("http://www.unicode.org/cldr/charts/latest/supplemental/territory_containment_un_m_49.html")))
